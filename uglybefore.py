@@ -1,33 +1,62 @@
-# Truly awful "pre-IBCS" style
-fig, ax = plt.subplots(figsize=(16, 7))
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Random clashing colors and overlapping bars
-ax.bar(df.index - 0.15, df["Actual_2024"], width=0.4, color='red', label="Actual 2024")
-ax.bar(df.index + 0.0, df["Plan_2025"], width=0.4, color='green', label="Plan 2025")
-ax.bar(df.index + 0.15, df["ActualForecast_2025"], width=0.4, color='blue', label="Actual/Forecast 2025")
+# === Data preparation ===
+months = pd.date_range("2024-01-01", "2025-12-01", freq="MS")
+labels = [m.strftime("%b-%y") for m in months]
 
-# Numbers above bars (huge and overlapping)
-for col, offset in zip(["Actual_2024", "Plan_2025", "ActualForecast_2025"], [-0.15, 0.0, 0.15]):
-    for i, val in enumerate(df[col]):
-        if not pd.isna(val):
-            ax.text(i + offset, val + 30, f"{val:.0f}", ha="center", va="bottom", fontsize=12, color='brown', fontweight='bold')
+# Random values for demonstration (500–1000 million)
+rng = np.random.default_rng(1)  # fixed seed for reproducibility
+sales_2024 = rng.integers(500, 1000, 12)
+sales_2025_actual = rng.integers(500, 1000, 3)   # Jan–Mar actual
+sales_2025_forecast = rng.integers(500, 1000, 9) # Apr–Dec forecast
+sales_2025_plan = rng.integers(550, 950, 12)     # plan values
 
-# Messy X-axis
+# Build DataFrame
+df = pd.DataFrame({
+    "Month": months,
+    "Label": labels,
+    "2024_actual": list(sales_2024) + [np.nan]*12,
+    "2025_plan": [np.nan]*12 + list(sales_2025_plan),
+    "2025_actual": [np.nan]*12 + list(sales_2025_actual) + [np.nan]*9,
+    "2025_forecast": [np.nan]*12 + [np.nan]*3 + list(sales_2025_forecast)
+})
+df["2025_actual_forecast"] = df["2025_actual"].fillna(df["2025_forecast"])
+
+# === Ugly chart (before IBCS) ===
+fig, ax = plt.subplots(figsize=(15, 6))
+
+# Overlapping bars with clashing colors
+ax.bar(df.index - 0.25, df["2024_actual"], width=0.4, color="magenta", label="Actual 2024")
+ax.bar(df.index, df["2025_plan"], width=0.4, color="lime", label="Plan 2025")
+ax.bar(df.index + 0.25, df["2025_actual_forecast"], width=0.4, color="cyan", label="Actual/Forecast 2025")
+
+# Big labels above bars (messy and overlapping)
+for col, shift in zip(["2024_actual", "2025_plan", "2025_actual_forecast"], [-0.25, 0, 0.25]):
+    for i, v in enumerate(df[col]):
+        if not np.isnan(v):
+            ax.text(i + shift, v + 30, str(int(v)),
+                    ha="center", va="bottom",
+                    fontsize=11, color="darkblue", weight="bold")
+
+# X-axis labels rotated
 ax.set_xticks(df.index)
-ax.set_xticklabels(df["Label"], rotation=30, ha="left", fontsize=10, color='darkblue')
+ax.set_xticklabels(df["Label"], rotation=35, ha="right", color="darkred")
 
-# Ugly thick gridlines
-ax.grid(True, which='both', axis='y', linestyle='--', linewidth=2, color='grey', alpha=0.7)
-ax.grid(True, which='both', axis='x', linestyle='-.', linewidth=1, color='black', alpha=0.5)
+# Heavy grid lines (ugly style)
+ax.grid(True, axis="y", linestyle="--", color="grey", linewidth=2)
+ax.grid(True, axis="x", linestyle="-.", color="black", linewidth=1)
 
-# Oversized, centered title
-ax.set_title("ALPHA CORPORATION — MONTHLY SALES VS PLAN!!!", fontsize=20, fontweight='heavy', color='darkred', loc='center')
+# Oversized title with exclamation marks
+ax.set_title("!!! ALPHA CORP MONTHLY SALES VS PLAN !!!",
+             fontsize=18, color="darkgreen", weight="bold")
 
 # Y-axis label
-ax.set_ylabel("Sales (€ millions)", fontsize=14, fontweight='bold', color='green')
+ax.set_ylabel("€ Millions", fontsize=12, color="purple")
 
-# Ugly legend on top of bars
-ax.legend(loc='upper center', fontsize=12, frameon=True, edgecolor='red')
+# Legend placed over the chart
+ax.legend(loc="upper center", ncol=3, frameon=True, edgecolor="red")
 
 plt.tight_layout()
 plt.show()
