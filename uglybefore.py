@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# === Data preparation ===
+# data preparation
 months = pd.date_range("2024-01-01", "2025-12-01", freq="MS")
 labels = [m.strftime("%b-%y") for m in months]
 
