@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 months = pd.date_range("2024-01-01", "2025-12-01", freq="MS")
 labels = [m.strftime("%b-%y") for m in months]
 
-# Random values for demonstration (500–1000 million)
-rng = np.random.default_rng(1)  # fixed seed for reproducibility
+# generate fake data
+rng = np.random.default_rng(42)  # fixed seed
 sales_2024 = rng.integers(500, 1000, 12)
 sales_2025_actual = rng.integers(500, 1000, 3)   # Jan–Mar actual
 sales_2025_forecast = rng.integers(500, 1000, 9) # Apr–Dec forecast
 sales_2025_plan = rng.integers(550, 950, 12)     # plan values
 
-# Build DataFrame
+# dataframe creation
 df = pd.DataFrame({
     "Month": months,
     "Label": labels,
@@ -24,15 +24,15 @@ df = pd.DataFrame({
 })
 df["2025_actual_forecast"] = df["2025_actual"].fillna(df["2025_forecast"])
 
-# === Ugly chart (before IBCS) ===
+# uggly ass chart
 fig, ax = plt.subplots(figsize=(15, 6))
 
-# Overlapping bars with clashing colors
+# really fancy coloring
 ax.bar(df.index - 0.25, df["2024_actual"], width=0.4, color="magenta", label="Actual 2024")
 ax.bar(df.index, df["2025_plan"], width=0.4, color="lime", label="Plan 2025")
 ax.bar(df.index + 0.25, df["2025_actual_forecast"], width=0.4, color="cyan", label="Actual/Forecast 2025")
 
-# Big labels above bars (messy and overlapping)
+#labels above
 for col, shift in zip(["2024_actual", "2025_plan", "2025_actual_forecast"], [-0.25, 0, 0.25]):
     for i, v in enumerate(df[col]):
         if not np.isnan(v):
@@ -55,7 +55,7 @@ ax.set_title("!!! ALPHA CORP MONTHLY SALES VS PLAN !!!",
 # Y-axis label
 ax.set_ylabel("€ Millions", fontsize=12, color="purple")
 
-# Legend placed over the chart
+# legend
 ax.legend(loc="upper center", ncol=3, frameon=True, edgecolor="red")
 
 plt.tight_layout()
