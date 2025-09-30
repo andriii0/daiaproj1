@@ -28,7 +28,7 @@ df["2025_actual_forecast"] = df["2025_actual"].fillna(df["2025_forecast"])
 fig, ax = plt.subplots(figsize=(15, 6))
 
 # really fancy coloring
-ax.bar(df.index - 0.25, df["2024_actual"], width=0.4, color="magenta", label="Actual 2024")
+ax.bar(df.index, df["2024_actual"], width=0.4, color="magenta", label="Actual 2024")
 ax.bar(df.index, df["2025_plan"], width=0.4, color="lime", label="Plan 2025")
 ax.bar(df.index + 0.25, df["2025_actual_forecast"], width=0.4, color="cyan", label="Actual/Forecast 2025")
 
